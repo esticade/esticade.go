@@ -5,7 +5,6 @@ Simple event driven micro-services framework http://esticade.io/
 
 ## Installing dependencies
 
-## Installing
 ``` bash
-got get 
+go get 
 ```
