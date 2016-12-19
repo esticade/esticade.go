@@ -5,5 +5,10 @@ type Service interface {
 	AlwaysOn(eventName string, callback func())
 	Emit(eventName string, payload interface{})
 	EmitChain(eventName string, payload interface{})
-	Shutdown()
+	Shutdown() error
+}
+
+type Transport interface {
+	Connect() error
+	Disconnect() error
 }

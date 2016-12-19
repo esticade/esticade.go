@@ -7,6 +7,12 @@ import (
 
 func main() {
 	fmt.Println("Connecting..")
-	service := esticade.NewService("Multiplication Service")
+	service, err := esticade.NewService("Multiplication Service")
+	if err != nil {
+		fmt.Printf("Connection failed (%s)\n", err.Error())
+		return
+	}
+
 	fmt.Printf("Connected to %#v\n", service)
+	defer service.Shutdown()
 }
