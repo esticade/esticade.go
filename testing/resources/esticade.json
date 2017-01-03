@@ -1,0 +1,5 @@
+{
+  "connectionURL": "amqp://user:pass@example.com/vhost",
+  "exchange": "test_exchange",
+  "engraved": true
+}

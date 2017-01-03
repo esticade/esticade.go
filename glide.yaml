@@ -1,0 +1,13 @@
+package: github.com/esticade.go
+homepage: http://esticade.io/
+import:
+- package: github.com/onsi/ginkgo
+  version: ^1.2.0
+- package: github.com/onsi/gomega
+  version: ^1.0
+- package: github.com/satori/go.uuid
+  version: ^1.1.0
+- package: github.com/streadway/amqp
+  version: 63795daa9a446c920826655f26ba31c81c860fd6
+- package: github.com/golang/mock
+  version: bd3c8e81be01eef76d4b503f5e687d2d1354d2d9
