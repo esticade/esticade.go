@@ -15,19 +15,6 @@ type amqpService struct {
 	transportService transport.AmqpService
 }
 
-type callbackAdapter struct {
-	callback func(event Event)
-}
-
-func (adapter callbackAdapter) doCallback(body []byte) error {
-	var event Event
-	if err := json.Unmarshal(body, &event); err != nil {
-		return err
-	}
-	adapter.callback(event)
-	return nil
-}
-
 func NewService(serviceName string) (Service, error) {
 	config := config.GetAmqpConfig()
 	service := &amqpService{
@@ -47,7 +34,18 @@ func (service *amqpService) Emit(eventName string, payload interface{}) error {
 }
 
 func (service *amqpService) On(eventName string, callback func(event Event)) error {
-	return service.transportService.On(eventName, "*." + eventName, callbackAdapter{callback}.doCallback)
+	return service.transportService.On(
+		eventName,
+		"*." + eventName,
+		func(body []byte) error {
+			var event Event
+			if err := json.Unmarshal(body, &event); err != nil {
+				return err
+			}
+			callback(event)
+			return nil
+		},
+	)
 }
 
 func (service *amqpService) Shutdown() error {
