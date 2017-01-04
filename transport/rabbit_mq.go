@@ -13,7 +13,7 @@ const MESSAGE_CONTENT_TYPE_JSON = "application/json"
 type rabbitMqService struct {
 	correlationBlock    string
 	url                 string
-	exchange            string
+	exchangeName        string
 	shuttingDown        bool
 	durable             bool
 	connection          *amqp.Connection
@@ -22,15 +22,15 @@ type rabbitMqService struct {
 }
 
 type consumer struct {
-	eventName   string
 	exchangeKey string
+	queueName   string
 	callback    func(body []byte) error
 }
 
 func NewRabbitMqService(url, exchange string, durable bool) AmqpService {
 	return &rabbitMqService{
 		url: url,
-		exchange: exchange,
+		exchangeName: exchange,
 		durable: durable,
 		shuttingDown: false,
 		connectionCloseChan: make(chan *amqp.Error),
@@ -45,40 +45,40 @@ func (service *rabbitMqService) Connect() error {
 	return nil
 }
 
-func (service *rabbitMqService) Emit(eventName, exchangeKey string, payload []byte) error {
+func (service *rabbitMqService) Emit(exchangeKey string, payload []byte) error {
 
 	channel, err := service.getChannel()
 	if err != nil {
 		return errors.New("Failed to open a channel:" + err.Error())
 	}
 
-	if err = createExchange(channel, service.exchange); err != nil {
+	if err = createExchange(channel, service.exchangeName); err != nil {
 		return fmt.Errorf("Failed to declare exchange: %s", err)
 	}
 
-	return channel.Publish(service.exchange, exchangeKey, false, false,
+	return channel.Publish(service.exchangeName, exchangeKey, false, false,
 		amqp.Publishing{
 			ContentType: MESSAGE_CONTENT_TYPE_JSON,
 			Body: payload,
 		})
 }
 
-func (service *rabbitMqService) On(eventName, exchangeKey string, callback func(body []byte) error) error {
+func (service *rabbitMqService) On(queueName, exchangeKey string, callback func(body []byte) error) error {
 	channel, err := service.getChannel()
 	if err != nil {
 		return errors.New("Failed to create a channel: " + err.Error())
 	}
 
-	queue, err := createQueue(channel, eventName, service.durable)
+	queue, err := createQueue(channel, queueName, service.durable)
 	if err != nil {
 		return errors.New("Failed to declare a queue: " + err.Error())
 	}
 
-	if err = createExchange(channel, service.exchange); err != nil {
+	if err = createExchange(channel, service.exchangeName); err != nil {
 		return fmt.Errorf("Failed to declare exchange: %s", err)
 	}
 
-	if err = channel.QueueBind(queue.Name, exchangeKey, service.exchange, false, nil); err != nil {
+	if err = channel.QueueBind(queue.Name, exchangeKey, service.exchangeName, false, nil); err != nil {
 		return errors.New("Failed to bind queue to exchange: " + err.Error())
 	}
 
@@ -88,7 +88,7 @@ func (service *rabbitMqService) On(eventName, exchangeKey string, callback func(
 	}
 
 	go startEventHandler(deliveries, callback)
-	service.consumers = append(service.consumers, &consumer{eventName: eventName, exchangeKey: exchangeKey, callback: callback})
+	service.consumers = append(service.consumers, &consumer{exchangeKey: exchangeKey, callback: callback})
 	return nil
 }
 
@@ -136,7 +136,7 @@ func (service *rabbitMqService) reconnectOnErrorHandler() {
 
 func (service *rabbitMqService) reattachConsumers() {
 	for _, element := range service.consumers {
-		service.On(element.eventName, element.exchangeKey, element.callback)
+		service.On(element.queueName, element.exchangeKey, element.callback)
 	}
 }
 

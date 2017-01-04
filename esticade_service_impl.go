@@ -30,12 +30,12 @@ func (service *amqpService) Emit(eventName string, payload interface{}) error {
 	if err != nil {
 		return errors.New("Failed to encode payload:" + err.Error())
 	}
-	return service.transportService.Emit(eventName, service.correlationBlock + "." + eventName, payloadByte)
+	return service.transportService.Emit(service.correlationBlock + "." + eventName, payloadByte)
 }
 
 func (service *amqpService) On(eventName string, callback func(event Event)) error {
 	return service.transportService.On(
-		eventName,
+		service.serviceName + "-" + eventName,
 		"*." + eventName,
 		func(body []byte) error {
 			var event Event

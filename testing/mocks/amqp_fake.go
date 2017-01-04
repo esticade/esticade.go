@@ -38,18 +38,18 @@ func (_mr *_MockAmqpServiceRecorder) Connect() *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "Connect")
 }
 
-func (_m *MockAmqpService) Emit(eventName string, exchangeKey string, payload []byte) error {
-	ret := _m.ctrl.Call(_m, "Emit", eventName, exchangeKey, payload)
+func (_m *MockAmqpService) Emit(exchangeKey string, payload []byte) error {
+	ret := _m.ctrl.Call(_m, "Emit", exchangeKey, payload)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockAmqpServiceRecorder) Emit(arg0, arg1, arg2 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "Emit", arg0, arg1, arg2)
+func (_mr *_MockAmqpServiceRecorder) Emit(arg0, arg1 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "Emit", arg0, arg1)
 }
 
-func (_m *MockAmqpService) On(eventName string, exchangeKey string, callback func([]byte) error) error {
-	ret := _m.ctrl.Call(_m, "On", eventName, exchangeKey, callback)
+func (_m *MockAmqpService) On(queueName string, exchangeKey string, callback func([]byte) error) error {
+	ret := _m.ctrl.Call(_m, "On", queueName, exchangeKey, callback)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
