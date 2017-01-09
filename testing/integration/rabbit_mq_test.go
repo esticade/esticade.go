@@ -3,12 +3,12 @@ package integration
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/esticade.go/config"
+	. "github.com/esticade/esticade.go/config"
 	"testing"
 	"os"
 	"time"
 	"strings"
-	"github.com/esticade.go"
+	"github.com/esticade/esticade.go"
 )
 
 func TestIntegration(t *testing.T) {

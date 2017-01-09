@@ -1,5 +1,5 @@
 if [ "$1" == "-i" ]; then
-    go test ./ github.com/esticade.go/config github.com/esticade.go/testing/integration
+    go test ./ github.com/esticade/esticade.go/config github.com/esticade/esticade.go/testing/integration
 else
-    go test ./ github.com/esticade.go/config
+    go test ./ github.com/esticade/esticade.go/config
 fi

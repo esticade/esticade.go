@@ -6,7 +6,7 @@ import (
 	"testing"
 	"github.com/satori/go.uuid"
 	"github.com/golang/mock/gomock"
-	"github.com/esticade.go/testing/mocks"
+	"github.com/esticade/esticade.go/testing/mocks"
 )
 
 func TestEsticade(t *testing.T) {

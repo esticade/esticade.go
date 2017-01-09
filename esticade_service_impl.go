@@ -2,8 +2,8 @@ package esticade
 
 import (
 	"github.com/satori/go.uuid"
-	"github.com/esticade.go/config"
-	"github.com/esticade.go/transport"
+	"github.com/esticade/esticade.go/config"
+	"github.com/esticade/esticade.go/transport"
 	"encoding/json"
 	"errors"
 )

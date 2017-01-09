@@ -3,7 +3,7 @@ package config_test
 import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/esticade.go/config"
+	. "github.com/esticade/esticade.go/config"
 	"testing"
 	"os"
 	"io/ioutil"
