@@ -126,6 +126,7 @@ func (service *rabbitMqService) reconnectOnErrorHandler() {
 		if service.shuttingDown {
 			return
 		} else if amqpError != nil {
+			log.Println("Reconnecting to " + service.url)
 			service.connection = reconnectToServer(service.url)
 			service.connectionCloseChan = make(chan *amqp.Error)
 			service.connection.NotifyClose(service.connectionCloseChan)
@@ -152,7 +153,6 @@ func startEventHandler(deliveries <-chan amqp.Delivery, callback func(body []byt
 
 func reconnectToServer(url string) *amqp.Connection {
 	for {
-		log.Println("Reconnecting to " + url)
 		conn, err := amqp.Dial(url)
 		if err == nil {
 			return conn

@@ -17,10 +17,14 @@ type amqpService struct {
 
 func NewService(serviceName string) (Service, error) {
 	config := config.GetAmqpConfig()
+	return NewServiceWithConfig(serviceName, config.GetAmqpUrl(), config.GetExchangeName(), config.GetEngraved())
+}
+
+func NewServiceWithConfig(serviceName, amqpUrl, exchangeName string, engraved bool) (Service, error) {
 	service := &amqpService{
 		serviceName: serviceName,
 		correlationBlock: string(uuid.NewV4().Bytes()),
-		transportService: transport.NewRabbitMqService(config.GetAmqpUrl(), config.GetExchangeName(), config.GetEngraved()),
+		transportService: transport.NewRabbitMqService(amqpUrl, exchangeName, engraved),
 	}
 	return service, service.transportService.Connect()
 }
