@@ -15,7 +15,7 @@ object.
 ## Service object
 
 - `esticade.NewService(serviceName)` - Will construct a new service and connect to the exchange.                            
-- `esticade.NewServiceWithConfig(serviceName, amqpUrl, exchangeName string, engraved bool)` - Will construct a new service with 
+- `esticade.NewServiceCustomConfiguration(serviceName, amqpUrl, exchangeName string, engraved bool)` - Will construct a new service with 
 the given configuration and connect to the exchange.                            
 - `on(eventName, callback)` - Will register event listener. Callback will be called with an `Event` object as the only 
 argument. If there are two or more instances of the same service running, the events will be equally divided between all the instances. 
@@ -74,7 +74,7 @@ received: my-event, Hello esticade
 
 Using `esticade.NewService(serviceName)` by default connects to localhost with user and pass guest/guest. This is the default configuration
 for RabbitMQ. If you want to override that, you can override it with a configuration file in any of following locations or use the 
-`esticade.NewServiceWithConfig(serviceName, amqpUrl, exchangeName string, engraved bool)` constructor
+`esticade.NewServiceCustomConfiguration(serviceName, amqpUrl, exchangeName string, engraved bool)` constructor
 
 - Environment variables for each of the configuration variables
 - A file pointed to by ESTICADERC environment variable
