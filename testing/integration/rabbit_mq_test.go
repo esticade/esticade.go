@@ -27,7 +27,8 @@ var _ = Describe("Rabbit MQ service", func() {
 		os.Setenv(ESTICADE_CONNECTION_URL_ENV_PROP, AMQP_DEFAULT_URL)
 		os.Setenv(ESTICADE_EXCHANGE_NAME_ENV_PROP, "events_integration_test")
 		os.Setenv(ESTICADE_ENGRAVED_ENV_PROP, "false")
-		serviceInstance, _ = esticade.NewService("Test service")
+		serviceInstance = esticade.NewService("Test service")
+		serviceInstance.Connect()
 		eventName = "test_event"
 	})
 
