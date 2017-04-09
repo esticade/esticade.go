@@ -16,9 +16,11 @@ object.
 
 - `esticade.NewService(serviceName)` - Will construct a new service and connect to the exchange.                            
 - `esticade.NewServiceCustomConfiguration(serviceName, amqpUrl, exchangeName string, engraved bool)` - Will construct a new service with 
-the given configuration and connect to the exchange.                            
-- `on(eventName, callback)` - Will register event listener. Callback will be called with an `Event` object as the only 
-argument. If there are two or more instances of the same service running, the events will be equally divided between all the instances. 
+the given configuration and connect to the exchange.    
+- `connect()` - Will attempt to connect to rabbit mq
+- `on(eventName, callback)` - Will register event listener function `func(event esticade.Event) error`. Callback will be called 
+with an `Event` object as the only argument. If there are two or more instances of the same service running, the events will be equally divided between all the instances.
+If the callback function returns an error, the message is not consumed and will be re-sent again.
 - `emit(eventName[, payload])` - Will emit event to the event network. Returns promise that is fulfilled once the event is emitted.
 - `shutdown()` - Will shut the entire service down, if there is nothing else keeping process alive, the process will terminate.
 
@@ -45,7 +47,8 @@ import (
 )
 
 func main() {
-	service, err := esticade.NewService("Esticade test");
+	service := esticade.NewService("Esticade test");
+	err := service.Connect()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -60,8 +63,9 @@ func main() {
 	service.Shutdown()
 }
 
-func callback(event esticade.Event) {
+func callback(event esticade.Event) error {
 	log.Printf("received: %s, %s", event.GetName(), event.GetBody())
+	return nil
 }
 ```
 

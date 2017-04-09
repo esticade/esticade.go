@@ -1,14 +1,16 @@
 package integration
 
 import (
+	"errors"
+	"github.com/esticade/esticade.go"
+	. "github.com/esticade/esticade.go/config"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	. "github.com/esticade/esticade.go/config"
-	"testing"
 	"os"
-	"time"
+
 	"strings"
-	"github.com/esticade/esticade.go"
+	"testing"
+	"time"
 )
 
 func TestIntegration(t *testing.T) {
@@ -20,7 +22,7 @@ var _ = Describe("Rabbit MQ service", func() {
 
 	var (
 		serviceInstance esticade.Service
-		eventName string
+		eventName       string
 	)
 
 	BeforeEach(func() {
@@ -95,6 +97,19 @@ var _ = Describe("Rabbit MQ service", func() {
 		})
 	})
 
+	Context("Handles errors when invoking callback functions", func() {
+
+		It("Resends the message if callback returns an error", func() {
+			callbackCounter := consumerInvocationCounter{invokedCount: 0}
+			serviceInstance.On(eventName, callbackCounter.callbackWithErrors)
+
+			serviceInstance.Emit(eventName, "testMsg")
+
+			time.Sleep(500 * time.Millisecond)
+			Expect(callbackCounter.invokedCount).Should(Equal(2))
+		})
+	})
+
 })
 
 func verifyInvoked(message interface{}, serviceInstance esticade.Service, eventName string) {
@@ -110,13 +125,22 @@ type consumerInvocationCounter struct {
 	expectedMessage interface{}
 }
 
-func (counter *consumerInvocationCounter) callIfBodyEqualsExpected(event esticade.Event) {
+func (counter *consumerInvocationCounter) callIfBodyEqualsExpected(event esticade.Event) error {
 	if counter.expectedMessage == event.Body {
 		counter.invokedCount = counter.invokedCount + 1
 	}
+	return nil
 }
 
-func (counter *consumerInvocationCounter) call(event esticade.Event) {
+func (counter *consumerInvocationCounter) call(event esticade.Event) error {
 	counter.invokedCount = counter.invokedCount + 1
+	return nil
+}
 
+func (counter *consumerInvocationCounter) callbackWithErrors(event esticade.Event) error {
+	if counter.invokedCount < 2 {
+		counter.invokedCount = counter.invokedCount + 1
+		return errors.New("integration test error")
+	}
+	return nil
 }

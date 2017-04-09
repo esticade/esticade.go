@@ -2,14 +2,14 @@ package esticade
 
 type Service interface {
 	Connect() error
-	On(eventName string, callback func(event Event)) error
+	On(eventName string, callback func(event Event) error) error
 	Emit(eventName string, payload interface{}) error
 	Shutdown() error
 }
 
 type Event struct {
-	EventId string `json:"id"`
-	Name    string `json:"name"`
+	EventId string      `json:"id"`
+	Name    string      `json:"name"`
 	Body    interface{} `json:"body"`
 }
 

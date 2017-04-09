@@ -1,12 +1,12 @@
 package esticade
 
 import (
+	"github.com/esticade/esticade.go/testing/mocks"
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
-	"testing"
 	"github.com/satori/go.uuid"
-	"github.com/golang/mock/gomock"
-	"github.com/esticade/esticade.go/testing/mocks"
+	"testing"
 )
 
 func TestEsticade(t *testing.T) {
@@ -19,10 +19,10 @@ var _ = Describe("Service interface", func() {
 	eventBody := "event_text"
 	serviceName := "service_name"
 	var (
-		mockCtrl *gomock.Controller
+		mockCtrl      *gomock.Controller
 		transportFake *mocks.MockAmqpService
-		uuidString string
-		service *amqpService
+		uuidString    string
+		service       *amqpService
 	)
 
 	BeforeEach(func() {
@@ -30,7 +30,7 @@ var _ = Describe("Service interface", func() {
 		transportFake = mocks.NewMockAmqpService(mockCtrl)
 		uuidString = string(uuid.NewV4().Bytes())
 		service = &amqpService{
-			serviceName: serviceName,
+			serviceName:      serviceName,
 			correlationBlock: uuidString,
 			transportService: transportFake,
 		}
@@ -43,13 +43,13 @@ var _ = Describe("Service interface", func() {
 
 	Context("When emiting new event", func() {
 		It("Calls Emit on amqp transport with correct parameters", func() {
-			transportFake.EXPECT().Emit(uuidString + "." + eventName, gomock.Any())
+			transportFake.EXPECT().Emit(uuidString+"."+eventName, gomock.Any())
 			service.Emit(eventName, eventBody)
 		})
 	})
 	Context("Adding new listener", func() {
 		It("Registers listener with amqp transport", func() {
-			transportFake.EXPECT().On(serviceName + "-" + eventName, "*." + eventName, gomock.Any())
+			transportFake.EXPECT().On(serviceName+"-"+eventName, "*."+eventName, gomock.Any())
 			service.On(eventName, testFunc)
 		})
 	})
@@ -61,6 +61,6 @@ var _ = Describe("Service interface", func() {
 	})
 })
 
-func testFunc(event Event) {
-
+func testFunc(event Event) error {
+	return nil
 }

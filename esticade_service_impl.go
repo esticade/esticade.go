@@ -1,11 +1,11 @@
 package esticade
 
 import (
-	"github.com/satori/go.uuid"
-	"github.com/esticade/esticade.go/config"
-	"github.com/esticade/esticade.go/transport"
 	"encoding/json"
 	"errors"
+	"github.com/esticade/esticade.go/config"
+	"github.com/esticade/esticade.go/transport"
+	"github.com/satori/go.uuid"
 )
 
 type amqpService struct {
@@ -22,7 +22,7 @@ func NewService(serviceName string) Service {
 
 func NewServiceCustomConfiguration(serviceName, amqpUrl, exchangeName string, engraved bool) Service {
 	service := &amqpService{
-		serviceName: serviceName,
+		serviceName:      serviceName,
 		correlationBlock: string(uuid.NewV4().Bytes()),
 		transportService: transport.NewRabbitMqService(amqpUrl, exchangeName, engraved),
 	}
@@ -38,20 +38,19 @@ func (service *amqpService) Emit(eventName string, payload interface{}) error {
 	if err != nil {
 		return errors.New("Failed to encode payload:" + err.Error())
 	}
-	return service.transportService.Emit(service.correlationBlock + "." + eventName, payloadByte)
+	return service.transportService.Emit(service.correlationBlock+"."+eventName, payloadByte)
 }
 
-func (service *amqpService) On(eventName string, callback func(event Event)) error {
+func (service *amqpService) On(eventName string, callback func(event Event) error) error {
 	return service.transportService.On(
-		service.serviceName + "-" + eventName,
-		"*." + eventName,
+		service.serviceName+"-"+eventName,
+		"*."+eventName,
 		func(body []byte) error {
 			var event Event
 			if err := json.Unmarshal(body, &event); err != nil {
 				return err
 			}
-			callback(event)
-			return nil
+			return callback(event)
 		},
 	)
 }

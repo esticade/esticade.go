@@ -1,11 +1,11 @@
 package transport
 
 import (
-	"github.com/streadway/amqp"
-	"fmt"
 	"errors"
-	"time"
+	"fmt"
+	"github.com/streadway/amqp"
 	"log"
+	"time"
 )
 
 const MESSAGE_CONTENT_TYPE_JSON = "application/json"
@@ -29,10 +29,10 @@ type consumer struct {
 
 func NewRabbitMqService(url, exchange string, durable bool) AmqpService {
 	return &rabbitMqService{
-		url: url,
-		exchangeName: exchange,
-		durable: durable,
-		shuttingDown: false,
+		url:                 url,
+		exchangeName:        exchange,
+		durable:             durable,
+		shuttingDown:        false,
 		connectionCloseChan: make(chan *amqp.Error),
 	}
 }
@@ -59,7 +59,7 @@ func (service *rabbitMqService) Emit(exchangeKey string, payload []byte) error {
 	return channel.Publish(service.exchangeName, exchangeKey, false, false,
 		amqp.Publishing{
 			ContentType: MESSAGE_CONTENT_TYPE_JSON,
-			Body: payload,
+			Body:        payload,
 		})
 }
 
@@ -146,7 +146,7 @@ func startEventHandler(deliveries <-chan amqp.Delivery, callback func(body []byt
 		if err := callback(delivery.Body); err == nil {
 			delivery.Ack(false)
 		} else {
-			log.Println("Error handling received event: " + err.Error())
+			delivery.Nack(false, true)
 		}
 	}
 }
@@ -163,7 +163,7 @@ func reconnectToServer(url string) *amqp.Connection {
 }
 
 func consumeQueue(channel *amqp.Channel, queueName string) (<-chan amqp.Delivery, error) {
-	return channel.Consume(queueName, "", false, false, false, false, nil, )
+	return channel.Consume(queueName, "", false, false, false, false, nil)
 }
 
 func createQueue(channel *amqp.Channel, queueName string, durable bool) (amqp.Queue, error) {
